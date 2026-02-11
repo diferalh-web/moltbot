@@ -1,0 +1,17 @@
+{
+  "id": "web_search",
+  "name": "Web Search Flow",
+  "version": "1.0.0",
+  "description": "Search the web and return results",
+  "authorized_tools": ["web_search", "search_and_summarize"],
+  "start": "entrada_1",
+  "nodes": [
+    {"id": "entrada_1", "type": "entrada", "config": {"input_key": "input"}},
+    {"id": "accion_1", "type": "accion", "config": {"tool": "web_search", "params": {"query": "{{current_input}}", "max_results": 10}}},
+    {"id": "salida_1", "type": "salida", "config": {"output_key": "result"}}
+  ],
+  "edges": [
+    {"source": "entrada_1", "target": "accion_1"},
+    {"source": "accion_1", "target": "salida_1"}
+  ]
+}

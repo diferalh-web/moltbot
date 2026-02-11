@@ -1,0 +1,43 @@
+{
+  "_comentario": "Configuraciones alternativas para Cursor con Ollama",
+  "_nota": "Prueba estas configuraciones si la primera no funciona",
+  
+  "opcion_1_estandar": {
+    "cursor.modelBaseUrl": "http://localhost:11438",
+    "cursor.model": "deepseek-coder:33b",
+    "cursor.apiKey": "ollama"
+  },
+  
+  "opcion_2_con_v1": {
+    "cursor.modelBaseUrl": "http://localhost:11438/v1",
+    "cursor.model": "deepseek-coder:33b",
+    "cursor.apiKey": "ollama"
+  },
+  
+  "opcion_3_ollama_ai": {
+    "cursor.aiModel": "ollama",
+    "cursor.modelBaseUrl": "http://localhost:11438",
+    "cursor.model": "deepseek-coder:33b",
+    "cursor.apiKey": "ollama"
+  },
+  
+  "opcion_4_mistral_general": {
+    "cursor.modelBaseUrl": "http://localhost:11436",
+    "cursor.model": "mistral:latest",
+    "cursor.apiKey": "ollama"
+  },
+  
+  "opcion_5_codellama": {
+    "cursor.modelBaseUrl": "http://localhost:11438",
+    "cursor.model": "codellama:34b",
+    "cursor.apiKey": "ollama"
+  }
+}
+
+
+
+
+
+
+
+

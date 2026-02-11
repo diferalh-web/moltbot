@@ -1,0 +1,35 @@
+# Herramientas y entorno para desarrollo
+
+## Workspace
+
+- Directorio de trabajo: `~/.openclaw/workspace`
+- Todo el código que generes vive aquí.
+- El usuario puede revisar conectándose por Cursor (Remote-SSH) a la VM.
+
+## Puertos comunes de servidores de desarrollo
+
+| Stack           | Comando típico  | Puerto por defecto |
+|-----------------|-----------------|--------------------|
+| Create React App| npm start       | 3000               |
+| Vite            | npm run dev     | 5173               |
+| Next.js         | npm run dev     | 3000               |
+| Node/Express    | node server.js  | 3000, 8080         |
+
+## Iniciar servidores en background
+
+Usa `exec` con `background: true` o `yieldMs` para que el proceso siga corriendo:
+
+```
+exec: { command: "cd proyecto && npm run dev", background: true }
+```
+
+El proceso sigue activo; usa `process` para listar, ver logs o matar si necesitas reiniciar.
+
+## Probar con el browser
+
+1. Asegúrate de que el servidor esté corriendo.
+2. `browser` → `navigate` a http://localhost:PUERTO
+3. `browser` → `snapshot` para ver el DOM/UI
+4. Si la página requiere interacción, usa `act` (click, type) con refs del snapshot.
+
+El browser corre en modo headless (sin ventana visible). No necesitas interfaz gráfica.

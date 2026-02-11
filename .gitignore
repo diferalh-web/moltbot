@@ -1,0 +1,65 @@
+# Moltbot - archivos a no versionar
+
+# Entorno y secretos (nunca commitear)
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+.webui_secret_key
+**/secrets.json
+**/auth-profiles.json
+
+# Configuraciones locales sensibles (opcional: descomenta si no quieres versionar)
+# **/config.json
+# **/openclaw.json
+
+# Discos virtuales y máquinas (pesados y locales)
+C/
+*.vdi
+*.vmdk
+*.vhd
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# Node (si se añade frontend)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# IDE y editores
+.cursor/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs y temporales
+*.log
+logs/
+log/
+tmp/
+temp/
+.cache/
+
+# Backups
+*.backup
+*.bak
+*.old
+backup/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Datos montados en Docker (viven en USERPROFILE, no en el repo)
+# Los compose referencian ${USERPROFILE}/...; no versionamos esos directorios

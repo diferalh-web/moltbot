@@ -1,0 +1,17 @@
+{
+  "id": "image_generation",
+  "name": "Image Generation Flow",
+  "version": "1.0.0",
+  "description": "Generate images via ComfyUI",
+  "authorized_tools": ["generate_image"],
+  "start": "entrada_1",
+  "nodes": [
+    {"id": "entrada_1", "type": "entrada", "config": {"input_key": "input"}},
+    {"id": "accion_1", "type": "accion", "config": {"tool": "generate_image", "params": {"prompt": "{{current_input}}", "width": 1024, "height": 1024}}},
+    {"id": "salida_1", "type": "salida", "config": {"output_key": "result"}}
+  ],
+  "edges": [
+    {"source": "entrada_1", "target": "accion_1"},
+    {"source": "accion_1", "target": "salida_1"}
+  ]
+}

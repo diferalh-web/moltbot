@@ -1,0 +1,342 @@
+services:
+  # Servicios existentes (mantener)
+  ollama-mistral:
+    image: ollama/ollama:latest
+    container_name: ollama-mistral
+    ports:
+      - "11436:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-mistral-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  ollama-qwen:
+    image: ollama/ollama:latest
+    container_name: ollama-qwen
+    ports:
+      - "11437:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-qwen-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  ollama-code:
+    image: ollama/ollama:latest
+    container_name: ollama-code
+    ports:
+      - "11438:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-code-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  ollama-flux:
+    image: ollama/ollama:latest
+    container_name: ollama-flux
+    ports:
+      - "11439:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-flux-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  comfyui:
+    image: ghcr.io/comfyanonymous/comfyui:latest
+    container_name: comfyui
+    ports:
+      - "7860:8188"
+    volumes:
+      - ${USERPROFILE}/comfyui-models:/root/.cache/huggingface
+      - ${USERPROFILE}/comfyui-models/checkpoints:/root/ComfyUI/models/checkpoints
+      - ${USERPROFILE}/comfyui-models/loras:/root/ComfyUI/models/loras
+      - ${USERPROFILE}/comfyui-models/latent_upscale_models:/root/ComfyUI/models/latent_upscale_models
+      - ${USERPROFILE}/comfyui-models/diffusion_models:/root/ComfyUI/models/diffusion_models
+      - ${USERPROFILE}/comfyui-models/text_encoders:/root/ComfyUI/models/text_encoders
+      - ${USERPROFILE}/comfyui-models/vae:/root/ComfyUI/models/vae
+      - ${USERPROFILE}/comfyui-output:/root/ComfyUI/output
+      - ${USERPROFILE}/comfyui-input:/root/ComfyUI/input
+    restart: unless-stopped
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+  stable-video:
+    image: python:3.11-slim
+    container_name: stable-video
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${USERPROFILE}/stable-video-data:/app
+      - ${USERPROFILE}/stable-video-models:/app/models
+      - ${USERPROFILE}/stable-video-output:/app/output
+    working_dir: /app
+    command: >
+      bash -c "
+      apt-get update && apt-get install -y git curl &&
+      pip install --no-cache-dir fastapi uvicorn python-multipart &&
+      pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 &&
+      pip install --no-cache-dir diffusers transformers accelerate imageio imageio-ffmpeg &&
+      python /app/stable_video_api.py
+      "
+    restart: unless-stopped
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      # SVD_DEVICE=cpu si hay error CUDA "no kernel image"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+  # Coqui TTS actualizado con XTTS para clonación de voz
+  coqui-tts:
+    image: python:3.11-slim
+    container_name: coqui-tts
+    ports:
+      - "5002:5002"
+    volumes:
+      - ${USERPROFILE}/coqui-tts-data:/app
+      - ${USERPROFILE}/coqui-tts-models:/root/.local/share/tts
+    working_dir: /app
+    command: >
+      bash -c "
+      apt-get update && apt-get install -y git curl build-essential espeak-ng libespeak-ng-dev portaudio19-dev &&
+      pip install --no-cache-dir TTS flask flask-cors torch torchaudio &&
+      python /app/tts_server.py
+      "
+    restart: unless-stopped
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+  # NUEVO: Servicio de búsqueda web
+  web-search:
+    image: python:3.11-slim
+    container_name: web-search
+    ports:
+      - "5003:5003"
+    volumes:
+      - ${USERPROFILE}/web-search-data:/app
+    working_dir: /app
+    command: >
+      bash -c "
+      apt-get update && apt-get install -y git curl &&
+      pip install --no-cache-dir flask flask-cors requests duckduckgo-search tavily-python &&
+      python /app/web_search_server.py
+      "
+    restart: unless-stopped
+    environment:
+      - PORT=5003
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # NUEVO: Gateway de APIs externas
+  external-apis-gateway:
+    image: python:3.11-slim
+    container_name: external-apis-gateway
+    ports:
+      - "5004:5004"
+    volumes:
+      - ${USERPROFILE}/external-apis-data:/app
+    working_dir: /app
+    command: >
+      bash -c "
+      apt-get update && apt-get install -y git curl &&
+      pip install --no-cache-dir flask flask-cors requests google-generativeai huggingface_hub &&
+      python /app/api_gateway.py
+      "
+    restart: unless-stopped
+    environment:
+      - PORT=5004
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY:-}
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Draco Core - flow-based agent orchestration
+  draco-core:
+    build:
+      context: ./draco-core
+      dockerfile: Dockerfile
+    container_name: draco-core
+    ports:
+      - "8001:8000"
+    volumes:
+      - ${USERPROFILE}/draco-core-data:/app/data
+      - ./draco-core/flows:/app/flows:ro
+    environment:
+      - COMFYUI_URL=http://comfyui:8188
+      - WEB_SEARCH_URL=http://web-search:5003
+      - OLLAMA_URL=http://ollama-mistral:11434
+      - TTS_URL=http://coqui-tts:5002
+      - VIDEO_URL=http://stable-video:8000
+      - COMFYUI_CHECKPOINT_NAME=${COMFYUI_CHECKPOINT_NAME:-v1-5-pruned-emaonly.safetensors}
+      - CHROMA_PERSIST_DIR=/app/data/chroma
+      - FLOWS_DIR=/app/flows
+      - DRACO_API_TOKEN=${DRACO_API_TOKEN:-}
+      - DRACO_REQUIRE_AUTH=${DRACO_REQUIRE_AUTH:-false}
+    depends_on:
+      - comfyui
+      - web-search
+    restart: unless-stopped
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Open WebUI actualizado con todos los servicios
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "0.0.0.0:8082:8080"  # 0.0.0.0 = escuchar en todas las interfaces (incl. Tailscale)
+    volumes:
+      - ${USERPROFILE}/open-webui-data:/app/backend/data
+      - ./extensions/open-webui-multimedia:/app/extensions/multimedia:ro
+    environment:
+      - WEBUI_URL=${WEBUI_URL:-http://localhost:8082}  # Usar Tailscale: http://tu-hostname:8082
+      - OLLAMA_BASE_URL=http://ollama-mistral:11434
+      - ENABLE_IMAGE_GENERATION=true
+      - IMAGE_GENERATION_ENGINE=comfyui
+      - IMAGE_GENERATION_API_URL=http://comfyui:8188
+      - COMFYUI_BASE_URL=http://comfyui:8188
+      - COMFYUI_CHECKPOINT_NAME=${COMFYUI_CHECKPOINT_NAME:-v1-5-pruned-emaonly.safetensors}
+      - VIDEO_GENERATION_API_URL=http://stable-video:8000
+      - TTS_API_URL=http://coqui-tts:5002
+      - FLUX_API_URL=http://ollama-flux:11434
+      - WEB_SEARCH_API_URL=http://web-search:5003
+      - EXTERNAL_APIS_GATEWAY_URL=http://external-apis-gateway:5004
+      - DRACO_CORE_URL=http://draco-core:8000
+    depends_on:
+      - ollama-mistral
+      - ollama-qwen
+      - ollama-code
+      - ollama-flux
+      - comfyui
+      - stable-video
+      - coqui-tts
+      - web-search
+      - external-apis-gateway
+      - draco-core
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+networks:
+  default:
+    name: ai-network
+    external: true
+
+
+
+
+
+
+
+
+

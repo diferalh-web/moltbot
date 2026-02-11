@@ -1,0 +1,282 @@
+version: '3.8'
+
+services:
+  # Servicios existentes (mantener)
+  ollama-mistral:
+    image: ollama/ollama:latest
+    container_name: ollama-mistral
+    ports:
+      - "11436:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-mistral-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  ollama-qwen:
+    image: ollama/ollama:latest
+    container_name: ollama-qwen
+    ports:
+      - "11437:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-qwen-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  # NUEVO: IA de Programación
+  ollama-code:
+    image: ollama/ollama:latest
+    container_name: ollama-code
+    ports:
+      - "11438:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-code-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  # NUEVO: Flux para generación de imágenes
+  ollama-flux:
+    image: ollama/ollama:latest
+    container_name: ollama-flux
+    ports:
+      - "11439:11434"
+    volumes:
+      - ${USERPROFILE}/ollama-flux-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  # NUEVO: ComfyUI para generación avanzada de imágenes
+  comfyui:
+    image: ghcr.io/comfyanonymous/comfyui:latest
+    container_name: comfyui
+    ports:
+      - "7860:8188"
+    volumes:
+      - ${USERPROFILE}/comfyui-models:/root/.cache/huggingface
+      # Carpeta que ComfyUI "Model Library" lee como checkpoints
+      - ${USERPROFILE}/comfyui-models/checkpoints:/root/ComfyUI/models/checkpoints
+      - ${USERPROFILE}/comfyui-models/loras:/root/ComfyUI/models/loras
+      - ${USERPROFILE}/comfyui-models/latent_upscale_models:/root/ComfyUI/models/latent_upscale_models
+      - ${USERPROFILE}/comfyui-models/diffusion_models:/root/ComfyUI/models/diffusion_models
+      - ${USERPROFILE}/comfyui-models/text_encoders:/root/ComfyUI/models/text_encoders
+      - ${USERPROFILE}/comfyui-models/vae:/root/ComfyUI/models/vae
+      - ${USERPROFILE}/comfyui-output:/root/ComfyUI/output
+      - ${USERPROFILE}/comfyui-input:/root/ComfyUI/input
+    restart: unless-stopped
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+  # NUEVO: Stable Video Diffusion
+  stable-video:
+    image: python:3.11-slim
+    container_name: stable-video
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${USERPROFILE}/stable-video-data:/app
+      - ${USERPROFILE}/stable-video-models:/app/models
+      - ${USERPROFILE}/stable-video-output:/app/output
+    working_dir: /app
+    command: >
+      bash -c "
+      apt-get update && apt-get install -y git curl &&
+      pip install --no-cache-dir fastapi uvicorn python-multipart torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 &&
+      pip install --no-cache-dir diffusers transformers accelerate imageio imageio-ffmpeg &&
+      python /app/stable_video_api.py
+      "
+    restart: unless-stopped
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+  # NUEVO: Coqui TTS
+  coqui-tts:
+    image: python:3.11-slim
+    container_name: coqui-tts
+    ports:
+      - "5002:5002"
+    volumes:
+      - ${USERPROFILE}/coqui-tts-data:/app
+      - ${USERPROFILE}/coqui-tts-models:/root/.local/share/tts
+    working_dir: /app
+    command: >
+      bash -c "
+      apt-get update && apt-get install -y git curl build-essential espeak-ng libespeak-ng-dev portaudio19-dev &&
+      pip install --no-cache-dir TTS flask flask-cors torch torchaudio &&
+      python /app/tts_server.py
+      "
+    restart: unless-stopped
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+  # NUEVO: Servicio de Búsqueda Web
+  web-search:
+    image: python:3.11-slim
+    container_name: web-search
+    ports:
+      - "5003:5003"
+    volumes:
+      - ${USERPROFILE}/web-search-data:/app
+      - ./web-search-data/web_search_server.py:/app/web_search_server.py:ro
+    working_dir: /app
+    command: >
+      bash -c "
+      apt-get update && apt-get install -y git curl &&
+      pip install --no-cache-dir flask flask-cors requests duckduckgo-search tavily-python beautifulsoup4 &&
+      python /app/web_search_server.py
+      "
+    restart: unless-stopped
+    environment:
+      - PORT=5003
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      # Clave para Open WebUI External Search (pon la misma en Admin > Web Search > API Key)
+      - EXTERNAL_SEARCH_API_KEY=opcional
+    networks:
+      - default
+
+  # Open WebUI actualizado con múltiples servicios
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.7.2
+    container_name: open-webui
+    ports:
+      - "0.0.0.0:8082:8080"  # Escucha en todas las interfaces (LAN/Tailscale)
+    volumes:
+      - ${USERPROFILE}/open-webui-data:/app/backend/data
+      - ./extensions/open-webui-multimedia:/app/extensions/multimedia:ro
+    environment:
+      - WEBUI_URL=${WEBUI_URL:-http://localhost:8082}  # Para Tailscale: http://tu-hostname:8082
+      # Conexión directa a un Ollama (como antes del proxy): puede hacer que Web Search sí se ejecute.
+      # Para volver a ver todos los modelos vía proxy: OLLAMA_BASE_URL=http://ollama-proxy:11440
+      - OLLAMA_BASE_URL=http://ollama-mistral:11434
+      # Generación de imágenes: motor ComfyUI (evita que pida API key de OpenAI)
+      - ENABLE_IMAGE_GENERATION=true
+      - IMAGE_GENERATION_ENGINE=comfyui
+      - IMAGE_GENERATION_API_URL=http://comfyui:8188
+      - COMFYUI_BASE_URL=http://comfyui:8188
+      # Checkpoint de ComfyUI para Flux (nombre del .safetensors en models/checkpoints)
+      - COMFYUI_CHECKPOINT_NAME=${COMFYUI_CHECKPOINT_NAME:-flux1-schnell.safetensors}
+      - VIDEO_GENERATION_API_URL=http://stable-video:8000
+      - TTS_API_URL=http://coqui-tts:5002
+      - FLUX_API_URL=http://ollama-flux:11434
+      - WEB_SEARCH_API_URL=http://web-search:5003
+      # URL completa para búsqueda externa (Open WebUI usa EXTERNAL_WEB_SEARCH_* en la UI)
+      - EXTERNAL_SEARCH_URL=http://web-search:5003/search
+      - EXTERNAL_WEB_SEARCH_URL=http://web-search:5003/search
+      - EXTERNAL_SEARCH_API_KEY=opcional
+      - EXTERNAL_WEB_SEARCH_API_KEY=opcional
+      # Habilitar búsqueda web integrada (Admin > Web Search debe tener URL externa)
+      - ENABLE_WEB_SEARCH=true
+    depends_on:
+      - ollama-mistral
+      - ollama-qwen
+      - ollama-code
+      - ollama-flux
+      - comfyui
+      - stable-video
+      - coqui-tts
+      - web-search
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+
+networks:
+  default:
+    name: ai-network
+    external: true
+

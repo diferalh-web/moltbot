@@ -1,0 +1,69 @@
+# .gitignore para OpenClaw/Moltbot
+# Copia este archivo a ~/.openclaw/.gitignore si usas git
+
+# Credenciales - NUNCA commitear
+**/auth-profiles.json
+**/.env
+**/*.key
+**/*.pem
+**/*.p12
+**/secrets.json
+
+# Configuraciones sensibles
+**/config.json
+**/openclaw.json
+**/models.json
+
+# Workspace personal (puede contener información privada)
+**/workspace/USER.md
+**/workspace/TOOLS.md
+**/workspace/SOUL.md
+
+# Logs
+**/*.log
+**/logs/
+**/log/
+
+# Backups
+**/backup/
+**/*.backup
+**/*.bak
+**/*.old
+
+# Datos temporales
+**/tmp/
+**/temp/
+**/.tmp/
+
+# Cache
+**/.cache/
+**/cache/
+
+# Node modules (si hay)
+**/node_modules/
+
+# Archivos del sistema
+**/.DS_Store
+**/Thumbs.db
+**/.vscode/
+**/.idea/
+
+# Archivos de sesión
+**/sessions/
+**/*.session
+
+# Notas: 
+# - IDENTITY.md y HEARTBEAT.md pueden ser commitados si no contienen info sensible
+# - Ajusta según tus necesidades de privacidad
+
+
+
+
+
+
+
+
+
+
+
+

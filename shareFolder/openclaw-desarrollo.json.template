@@ -1,0 +1,48 @@
+{
+  "tools": {
+    "profile": "coding",
+    "allow": [
+      "web_search",
+      "web_fetch",
+      "browser",
+      "group:fs",
+      "group:runtime",
+      "group:sessions",
+      "group:memory",
+      "image"
+    ],
+    "web": {
+      "search": { "enabled": true },
+      "fetch": { "enabled": true }
+    },
+    "subagents": {
+      "tools": {
+        "allow": [
+          "web_search",
+          "web_fetch",
+          "read",
+          "write",
+          "edit",
+          "exec",
+          "process",
+          "browser"
+        ]
+      }
+    }
+  },
+  "browser": {
+    "enabled": true,
+    "headless": true,
+    "noSandbox": true,
+    "executablePath": "/usr/bin/google-chrome-stable",
+    "defaultProfile": "openclaw"
+  },
+  "agents": {
+    "defaults": {
+      "timeoutSeconds": 1200,
+      "subagents": {
+        "maxConcurrent": 4
+      }
+    }
+  }
+}

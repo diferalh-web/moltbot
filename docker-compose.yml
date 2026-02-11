@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  moltbot:
+    image: node:22-alpine
+    container_name: moltbot
+    restart: unless-stopped
+    
+    # Volúmenes para persistencia de datos
+    volumes:
+      - ./moltbot-data:/app/data
+      - ./moltbot-config:/app/config
+      - ./moltbot-logs:/app/logs
+    
+    # Variables de entorno (configurar en .env)
+    environment:
+      - NODE_ENV=production
+      # Agregar más variables según necesites
+      # - API_KEY=${API_KEY}
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+    
+    # Red aislada (opcional - descomentar para aislar completamente)
+    # networks:
+    #   - isolated-network
+    
+    # Comando para instalar y ejecutar Moltbot
+    command: sh -c "npm install -g moltbot@latest && moltbot"
+    
+    # Limitar recursos (opcional)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+# Red aislada (opcional)
+# networks:
+#   isolated-network:
+#     driver: bridge
+#     internal: true  # Sin acceso a internet externa
+
+
+
+
+
+
+
+
+
+
+
+

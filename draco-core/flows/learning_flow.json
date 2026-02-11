@@ -1,0 +1,17 @@
+{
+  "id": "learning",
+  "name": "Learning Flow",
+  "version": "1.0.0",
+  "description": "Flow for storing information in memory. Only this flow can write to memory.",
+  "authorized_tools": ["*"],
+  "start": "entrada_1",
+  "nodes": [
+    {"id": "entrada_1", "type": "entrada", "config": {"input_key": "input"}},
+    {"id": "memoria_1", "type": "memoria", "config": {"operation": "write", "query": "{{current_input}}"}},
+    {"id": "salida_1", "type": "salida", "config": {"output_key": "result"}}
+  ],
+  "edges": [
+    {"source": "entrada_1", "target": "memoria_1"},
+    {"source": "memoria_1", "target": "salida_1"}
+  ]
+}

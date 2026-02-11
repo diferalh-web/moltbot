@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  moltbot:
+    image: node:22-alpine
+    container_name: moltbot-secure
+    restart: unless-stopped
+    
+    # Configuración de seguridad
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL  # Eliminar todas las capacidades
+    # cap_add:  # Agregar solo las necesarias
+    #   - CHOWN
+    #   - SETUID
+    #   - SETGID
+    
+    # Sistema de archivos de solo lectura
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /var/tmp:noexec,nosuid,size=50m
+    
+    # Ejecutar como usuario no-root
+    user: "1000:1000"
+    
+    # Volúmenes
+    volumes:
+      - ./moltbot-data:/app/data:rw
+      - ./moltbot-config:/app/config:ro
+      - ./moltbot-logs:/app/logs:rw
+    
+    # Variables de entorno
+    environment:
+      - NODE_ENV=production
+    
+    # Red aislada
+    networks:
+      - isolated-network
+    
+    # Comando
+    command: sh -c "npm install -g moltbot@latest && moltbot"
+    
+    # Limitar recursos
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+networks:
+  isolated-network:
+    driver: bridge
+    # internal: true  # Descomentar para aislar completamente de internet
+
+
+
+
+
+
+
+
+
+
+
+

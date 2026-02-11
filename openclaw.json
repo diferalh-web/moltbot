@@ -1,0 +1,22 @@
+{
+  "models": {
+    "llama2": {
+      "provider": "ollama",
+      "model": "llama2",
+      "baseURL": "http://192.168.100.42:11435"
+    }
+  },
+  "model": "llama2"
+}
+
+
+
+
+
+
+
+
+
+
+
+
