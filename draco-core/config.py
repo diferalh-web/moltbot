@@ -10,6 +10,7 @@ from typing import Optional
 COMFYUI_URL = os.getenv("COMFYUI_URL", "http://comfyui:8188")
 WEB_SEARCH_URL = os.getenv("WEB_SEARCH_URL", "http://web-search:5003")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama-mistral:11434")
+OLLAMA_CHAT_MODEL = os.getenv("OLLAMA_CHAT_MODEL", "mistral")
 TTS_URL = os.getenv("TTS_URL", "http://coqui-tts:5002")
 VIDEO_URL = os.getenv("VIDEO_URL", "http://stable-video:8000")
 
