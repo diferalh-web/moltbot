@@ -105,7 +105,7 @@ services:
       - default
 
   comfyui:
-    image: ghcr.io/comfyanonymous/comfyui:latest
+    image: ${COMFYUI_IMAGE:-ghcr.io/comfyanonymous/comfyui:latest}
     container_name: comfyui
     ports:
       - "7860:8188"
@@ -259,6 +259,7 @@ services:
     volumes:
       - ${USERPROFILE}/draco-core-data:/app/data
       - ./draco-core/flows:/app/flows:ro
+      - ./draco-core/config:/app/config:ro
     environment:
       - COMFYUI_URL=http://comfyui:8188
       - WEB_SEARCH_URL=http://web-search:5003
@@ -305,6 +306,7 @@ services:
       - WEB_SEARCH_API_URL=http://web-search:5003
       - EXTERNAL_APIS_GATEWAY_URL=http://external-apis-gateway:5004
       - DRACO_CORE_URL=http://draco-core:8000
+      - DRACO_API_TOKEN=${DRACO_API_TOKEN:-}
     depends_on:
       - ollama-mistral
       - ollama-qwen

@@ -37,7 +37,7 @@ def _resolve_params(params: Dict[str, Any], context: Dict[str, Any]) -> Dict[str
 # Import audit and tools
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from audit import log_execution, new_execution_id
+from audit import log_execution, log_flow_start, new_execution_id
 from tools.registry import execute_tool, is_tool_authorized
 
 
@@ -90,6 +90,9 @@ class FlowEngine:
             log_execution(exec_id, flow_id, "engine", "flow_not_found")
             return {"success": False, "error": f"Flow '{flow_id}' not found", "execution_id": exec_id}
 
+        input_preview = str(input_data.get("input", input_data) or "")[:200]
+        log_flow_start(flow_id, exec_id, input_preview, max_preview_len=80)
+
         nodes_def = flow.get("nodes", [])
         start_node = flow.get("start", nodes_def[0]["id"] if nodes_def else "")
 
@@ -106,6 +109,9 @@ class FlowEngine:
             "flow_id": flow_id,
             "is_learning_flow": is_learning_flow,
         }
+        if flow_id == "deep_search":
+            context.setdefault("search_results", [])
+            context.setdefault("search_round", 0)
 
         current_node_id = start_node
         max_steps = 100
@@ -146,6 +152,18 @@ class FlowEngine:
                         tool_result = execute_tool(tool_name, tool_params, context)
                         context["result"] = tool_result
                         context["last_tool_result"] = tool_result
+                        if flow_id == "deep_search" and tool_name == "refine_search_query":
+                            refined = (tool_result.get("refined_query") or "").strip()
+                            if refined:
+                                context["current_input"] = refined
+                        if flow_id == "deep_search" and tool_name == "web_search":
+                            context.setdefault("search_results", []).append(tool_result)
+                            context["search_round"] = context.get("search_round", 0) + 1
+                        if flow_id == "deep_search" and tool_name == "evaluate_search_relevance":
+                            context["search_relevant"] = bool(tool_result.get("relevant", False))
+                            max_rounds = 2
+                            if context.get("search_round", 0) >= max_rounds:
+                                context["search_relevant"] = True
                         log_execution(exec_id, flow_id, current_node_id, "tool_executed", tool=tool_name)
                     except Exception as e:
                         log_execution(exec_id, flow_id, current_node_id, "tool_error", tool=tool_name, error=str(e))

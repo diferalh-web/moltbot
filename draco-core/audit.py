@@ -45,3 +45,30 @@ def log_execution(
 
 def new_execution_id() -> str:
     return str(uuid.uuid4())
+
+
+def log_flow_start(flow_id: str, execution_id: str, input_preview: str = "", max_preview_len: int = 80) -> None:
+    """Log when a flow execution starts (easy to grep: deep_search, web_search, etc.)."""
+    preview = (input_preview or "").strip()[:max_preview_len]
+    if len((input_preview or "").strip()) > max_preview_len:
+        preview += "..."
+    get_audit_logger().info(
+        "[Draco] flow=%s execution_id=%s event=started input_preview=%s",
+        flow_id,
+        execution_id,
+        repr(preview),
+    )
+
+
+def log_flow_end(
+    flow_id: str,
+    execution_id: str,
+    success: bool,
+    error: Optional[str] = None,
+) -> None:
+    """Log when a flow execution ends (success or failure)."""
+    msg = "[Draco] flow=%s execution_id=%s event=completed success=%s" % (flow_id, execution_id, success)
+    if error and not success:
+        err_preview = (error or "")[:120] + ("..." if len(error or "") > 120 else "")
+        msg += " error=%s" % repr(err_preview)
+    get_audit_logger().info(msg)

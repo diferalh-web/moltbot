@@ -60,7 +60,16 @@ class DecisionNode(BaseNode):
 
     def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
         branches = self.config.get("branches", {})
-        condition = self.config.get("condition", "default")
+        condition_key = self.config.get("condition_key")
+        if condition_key is not None:
+            raw = context.get(condition_key)
+            condition = str(raw).lower() if raw is not None else "default"
+            if condition in ("true", "yes", "1"):
+                condition = "true"
+            elif condition in ("false", "no", "0"):
+                condition = "false"
+        else:
+            condition = self.config.get("condition", "default")
         next_node = branches.get(condition, branches.get("default", ""))
         context["next_node"] = next_node
         return {"success": True, "next_node": next_node, "context": context}

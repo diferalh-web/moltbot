@@ -1,0 +1,24 @@
+{
+  "id": "deep_search",
+  "name": "Deep Search Flow",
+  "version": "1.0.0",
+  "description": "Interpret query with LLM, then multi-step web search, evaluate, and consolidate. Generic for any topic.",
+  "authorized_tools": ["refine_search_query", "web_search", "evaluate_search_relevance", "consolidate_search_results"],
+  "start": "entrada_1",
+  "nodes": [
+    {"id": "entrada_1", "type": "entrada", "config": {"input_key": "input"}},
+    {"id": "accion_refine", "type": "accion", "config": {"tool": "refine_search_query", "params": {"query": "{{current_input}}"}}},
+    {"id": "accion_search", "type": "accion", "config": {"tool": "web_search", "params": {"query": "{{current_input}}", "max_results": 18, "search_round": "{{search_round}}"}}},
+    {"id": "accion_evaluate", "type": "accion", "config": {"tool": "evaluate_search_relevance", "params": {"query": "{{current_input}}", "search_results": "{{last_tool_result}}"}}},
+    {"id": "decision_1", "type": "decision", "config": {"condition_key": "search_relevant", "branches": {"true": "accion_consolidate", "false": "accion_search"}, "default": "accion_consolidate"}},
+    {"id": "accion_consolidate", "type": "accion", "config": {"tool": "consolidate_search_results", "params": {"query": "{{current_input}}", "accumulated_results": "{{search_results}}"}}},
+    {"id": "salida_1", "type": "salida", "config": {"output_key": "result"}}
+  ],
+  "edges": [
+    {"source": "entrada_1", "target": "accion_refine"},
+    {"source": "accion_refine", "target": "accion_search"},
+    {"source": "accion_search", "target": "accion_evaluate"},
+    {"source": "accion_evaluate", "target": "decision_1"},
+    {"source": "accion_consolidate", "target": "salida_1"}
+  ]
+}

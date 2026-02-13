@@ -1,0 +1,57 @@
+{
+  "preferred_sources": {
+    "crypto": [
+      ["site:coinmarketcap.com", 5],
+      ["site:coingecko.com", 5]
+    ],
+    "stocks": [
+      ["site:finance.yahoo.com", 6],
+      ["site:investing.com", 6]
+    ],
+    "tech_news": [
+      ["site:techcrunch.com", 4],
+      ["site:theverge.com", 4],
+      ["site:arstechnica.com", 4]
+    ],
+    "health": [
+      ["site:who.int", 4],
+      ["site:mayoclinic.org", 4],
+      ["site:webmd.com", 4]
+    ],
+    "science": [
+      ["site:nature.com", 4],
+      ["site:sciencedaily.com", 4]
+    ],
+    "general_news": [
+      ["site:reuters.com", 4],
+      ["site:bbc.com", 4]
+    ]
+  },
+  "topic_keywords": {
+    "crypto": [
+      "bitcoin", "btc", "ethereum", "eth", "cripto", "crypto",
+      "coinmarketcap", "coingecko", "cryptocurrency", "altcoin", "defi"
+    ],
+    "stocks": [
+      "precio", "price", "valor", "value", "stock", "acción", "acciones",
+      "share", "shares", "cotización", "nvda", "tsla", "aapl", "amzn",
+      "meta", "googl", "msft", "bolsa", "nasdaq"
+    ],
+    "tech_news": [
+      "tech", "tecnología", "startup", "silicon valley", "apple", "google",
+      "microsoft", "intel", "amd", "nvidia", "noticia tech", "tech news"
+    ],
+    "health": [
+      "salud", "health", "enfermedad", "síntomas", "tratamiento", "medicina",
+      "mayo clinic", "oms", "who", "virus", "vacuna", "vaccine"
+    ],
+    "science": [
+      "ciencia", "science", "estudio", "investigación", "nature", "paper",
+      "investigadores"
+    ],
+    "general_news": [
+      "noticia", "news", "última hora", "breaking", "reuters", "bbc"
+    ]
+  },
+  "_comment": "Añade temas en preferred_sources y las palabras clave en topic_keywords. Orden de temas importa: más específicos primero. Cambios aplican sin reiniciar (se lee en cada búsqueda)."
+}
